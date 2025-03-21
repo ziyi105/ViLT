@@ -12,7 +12,6 @@ from einops import rearrange
 
 from vilt.modules.dist_utils import all_gather
 
-
 def cost_matrix_cosine(x, y, eps=1e-5):
     """Compute cosine distnace across every pairs of x, y (batched)
     [B, L_x, D] [B, L_y, D] -> [B, Lx, Ly]"""
@@ -86,6 +85,24 @@ def optimal_transport_dist(
     distance = trace(cost.matmul(T.detach()))
     return distance
 
+def compute_bbox(pl_module, batch):
+    # Get model predictions for bounding boxes
+    outputs = pl_module.infer(batch)
+    bbox_pred = outputs["bbox_pred"]  # Predicted bounding boxes
+    bbox_target = batch["bbox"]       # Ground truth bounding boxes
+
+    # Compute MSE loss between predicted and target bounding boxes
+    bbox_loss = F.mse_loss(bbox_pred, bbox_target)
+
+    # Determine whether we are in training or validation phase
+    phase = "train" if pl_module.training else "val"
+
+    # Log the loss using PyTorch Lightning's logging system
+    bbox_loss_logged = getattr(pl_module, f"{phase}_bbox_loss")(bbox_loss)
+    pl_module.log(f"bbox/{phase}/bbox_loss", bbox_loss_logged)
+
+    # Return the loss as a dictionary (to be used by the training loop)
+    return {"bbox_loss": bbox_loss}
 
 def compute_mlm(pl_module, batch):
     infer = pl_module.infer(batch, mask_text=True, mask_image=False)

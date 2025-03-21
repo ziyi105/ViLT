@@ -11,6 +11,7 @@ def _loss_names(d):
         "vqa": 0,
         "nlvr2": 0,
         "irtr": 0,
+        "bbox": 0,
     }
     ret.update(d)
     return ret
@@ -20,7 +21,7 @@ def _loss_names(d):
 def config():
     exp_name = "vilt"
     seed = 0
-    datasets = ["coco", "vg", "sbu", "gcc"]
+    datasets = ["coco", "vg", "sbu", "gcc", "bbox"] 
     loss_names = _loss_names({"itm": 1, "mlm": 1})
     batch_size = 4096  # this is a desired batch size; pl trainer will accumulate gradients when per step batch is smaller.
 
@@ -88,6 +89,14 @@ def env_dandelin():
     log_dir = "/data2/vilt/result"
     num_gpus = 8
     num_nodes = 1
+
+@ex.named_config
+def env_colab():
+    data_root = "/content/drive/MyDrive/"
+    log_dir = "/vilt/output"
+    num_gpus = 1
+    num_nodes = 1
+    num_workers = 2  # Colab has limited CPU cores
 
 
 # Named configs for "task" which define datasets, loss_names and desired batch_size, warmup_steps, epochs, and exp_name
@@ -237,6 +246,17 @@ def task_finetune_irtr_f30k_randaug():
     draw_false_text = 15
     learning_rate = 1e-4
 
+@ex.named_config
+def task_bbox_prediction():
+    exp_name = "bbox_prediction"
+    datasets = ["ViLT_dataset"]  # Match your arrow dataset name
+    loss_names = _loss_names({"bbox": 1})  # New loss type
+    batch_size = 10  # Adjust based on Colab's GPU memory
+    max_epoch = 20
+    max_text_len = 60  # If your text descriptions are longer
+    learning_rate = 3e-5
+    warmup_steps = 500
+    draw_false_image = 0  # Disable negative sampling if unnecessary
 
 # Named configs for "etc" which are orthogonal to "env" and "task", need to be added at the end
 

@@ -189,6 +189,9 @@ class ViLTransformerSS(pl.LightningModule):
             ret.update(self.infer(batch))
             return ret
 
+        if "bbox" in self.current_tasks:
+            ret.update(objectives.compute_bbox(self, batch))
+            
         # Masked Language Modeling
         if "mlm" in self.current_tasks:
             ret.update(objectives.compute_mlm(self, batch))
