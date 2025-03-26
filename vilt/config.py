@@ -92,7 +92,7 @@ def env_dandelin():
 
 @ex.named_config
 def env_colab():
-    data_root = "/content/drive/MyDrive/"
+    data_root = "/C:/Users/ahziy/OneDrive/Y4S1/FYP/ViLT/vilt/data/"
     log_dir = "/vilt/output"
     num_gpus = 1
     num_nodes = 1
@@ -253,7 +253,7 @@ def task_bbox_prediction():
     loss_names = _loss_names({"bbox": 1})  # New loss type
     batch_size = 10  # Adjust based on Colab's GPU memory
     max_epoch = 20
-    max_text_len = 60  # If your text descriptions are longer
+    max_text_len = 40  # If your text descriptions are longer
     learning_rate = 3e-5
     warmup_steps = 500
     draw_false_image = 0  # Disable negative sampling if unnecessary

@@ -1,9 +1,14 @@
 from vilt.modules import ViLTForBBoxPrediction
 from vilt.transforms import keys_to_transforms
 from PIL import Image
+import matplotlib.pyplot as plt
 import cv2
+from transformers import ViltProcessor
 
-model = ViLTForBBoxPrediction.from_pretrained("path/to/your/finetuned/model")
+processor = ViltProcessor.from_pretrained("dandelin/vilt-b32-finetuned-vqa")
+
+
+model = ViLTForBBoxPrediction.from_pretrained("data/weights/vilt_200k_mlm_itm.ckpt")
 transforms = keys_to_transforms(["custom_dataset"], size=384)
 
 def predict_bbox(image_path, text):

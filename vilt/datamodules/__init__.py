@@ -15,5 +15,5 @@ _datamodules = {
     "sbu": SBUCaptionDataModule,
     "vqa": VQAv2DataModule,
     "nlvr2": NLVR2DataModule,
-    "bbox_prediction": BBoxPredictionDataModule,
+    "ViLT_dataset": BBoxPredictionDataModule,
 }
