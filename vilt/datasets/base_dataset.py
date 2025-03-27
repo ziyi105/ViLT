@@ -86,10 +86,19 @@ class BaseDataset(torch.utils.data.Dataset):
         return len(self.index_mapper)
 
     def get_raw_image(self, index, image_key="image"):
+        """
+        Load raw image either from binary data in the .arrow file or from file paths.
+        """
         index, caption_index = self.index_mapper[index]
-        image_bytes = io.BytesIO(self.table[image_key][index].as_py())
-        image_bytes.seek(0)
-        return Image.open(image_bytes).convert("RGB")
+        image_data = self.table[image_key][index].as_py()
+
+        if isinstance(image_data, str): 
+            image_path = os.path.join(self.data_dir, "images", image_data)
+            return Image.open(image_path).convert("RGB")
+        else:
+            image_bytes = io.BytesIO(image_data)
+            image_bytes.seek(0)
+            return Image.open(image_bytes).convert("RGB")
 
     def get_image(self, index, image_key="image"):
         image = self.get_raw_image(index, image_key=image_key)
